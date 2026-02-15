@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Barba - Barba de Respeito</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX'); // Substitua pelo seu ID do Google Analytics
+    </script>
+    
+    <!-- Facebook Pixel -->
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', 'XXXXXXXXXXXXXXXXX'); // Substitua pelo seu Pixel ID
+        fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=XXXXXXXXXXXXXXXXX&ev=PageView&noscript=1"
+    /></noscript>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+        
+        .brand-orange {
+            color: #ff6b35;
+        }
+        
+        .bg-brand-orange {
+            background-color: #ff6b35;
+        }
+        
+        .border-brand-orange {
+            border-color: #ff6b35;
+        }
+        
+        .hover-lift {
+            transition: transform 0.2s;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-5px);
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff6b35;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .photo-slot {
+            position: relative;
+            aspect-ratio: 3/4;
+            border: 3px dashed #d1d5db;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .photo-slot:hover {
+            border-color: #ff6b35;
+            transform: scale(1.02);
+        }
+        
+        .photo-slot.filled {
+            border-color: #10b981;
+            border-style: solid;
+        }
+        
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+        
+        .step {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: bold;
+        }
+        
+        .step.active .step-circle {
+            background: #ff6b35;
+            color: white;
+        }
+        
+        .step.completed .step-circle {
+            background: #10b981;
+            color: white;
+        }
+        
+        .instruction-card {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border-left: 4px solid #ff6b35;
+        }
+        
+        .product-card {
+            transition: all 0.3s;
+            height: 100%;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .badge-priority-alta {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .badge-priority-media {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .badge-priority-baixa {
+            background: #6b7280;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white py-8 shadow-2xl">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center mb-4">
+                <img src="/logo.png" alt="Barba de Respeito" class="h-16 md:h-20" />
+            </div>
+            <p class="text-center mt-3 text-gray-300 text-lg font-semibold">Diagnóstico Inteligente com IA 🤖</p>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        
+        <!-- Indicador de Passos -->
+        <div class="step-indicator mb-12">
+            <div class="step active" id="step-indicator-1">
+                <div class="step-circle">1</div>
+                <p class="text-sm font-semibold">Fotos</p>
+            </div>
+            <div class="step" id="step-indicator-2">
+                <div class="step-circle">2</div>
+                <p class="text-sm font-semibold">Questionário</p>
+            </div>
+            <div class="step" id="step-indicator-3">
+                <div class="step-circle">3</div>
+                <p class="text-sm font-semibold">Análise</p>
+            </div>
+            <div class="step" id="step-indicator-4">
+                <div class="step-circle">4</div>
+                <p class="text-sm font-semibold">Resultados</p>
+            </div>
+        </div>
+
+        <!-- PASSO 1: Upload de 3 Fotos -->
+        <div id="section-fotos" class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <div class="flex items-center mb-6">
+                <span class="bg-brand-orange text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mr-4">📸</span>
+                <div>
+                    <h2 class="text-3xl font-bold">Tire 3 fotos da sua barba</h2>
+                    <p class="text-gray-600 mt-1">Para uma análise precisa, precisamos ver todos os ângulos</p>
+                </div>
+            </div>
+
+            <!-- Instruções -->
+            <div class="instruction-card rounded-lg p-6 mb-8">
+                <h3 class="font-bold text-lg mb-3 brand-orange">📋 Instruções importantes:</h3>
+                <ul class="space-y-2 text-gray-700">
+                    <li class="flex items-start">
+                        <span class="brand-orange font-bold mr-2">✓</span>
+                        <span>Tire as fotos em um lugar bem iluminado (luz natural é ideal)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="brand-orange font-bold mr-2">✓</span>
+                        <span>Mantenha o rosto próximo à câmera (cerca de 30-40cm)</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="brand-orange font-bold mr-2">✓</span>
+                        <span>Não use filtros ou edições nas fotos</span>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="brand-orange font-bold mr-2">✓</span>
+                        <span>Certifique-se que a barba está visível e em foco</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Grid de Fotos -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Foto Direita -->
+                <div class="text-center">
+                    <h3 class="font-bold mb-3 text-lg">1️⃣ Lado Direito</h3>
+                    <div class="photo-slot" id="slot-direita" onclick="document.getElementById('input-direita').click()">
+                        <input type="file" id="input-direita" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 'direita')" />
+                        <div class="flex flex-col items-center justify-center h-full p-4" id="placeholder-direita">
+                            <svg class="w-16 h-16 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <p class="text-sm text-gray-500 font-semibold">Clique para tirar foto</p>
+                            <p class="text-xs text-gray-400 mt-1">Vire o rosto 45° à direita</p>
+                        </div>
+                        <img id="preview-direita" class="hidden" />
+                    </div>
+                </div>
+
+                <!-- Foto Frente -->
+                <div class="text-center">
+                    <h3 class="font-bold mb-3 text-lg">2️⃣ Frente</h3>
+                    <div class="photo-slot" id="slot-frente" onclick="document.getElementById('input-frente').click()">
+                        <input type="file" id="input-frente" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 'frente')" />
+                        <div class="flex flex-col items-center justify-center h-full p-4" id="placeholder-frente">
+                            <svg class="w-16 h-16 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <p class="text-sm text-gray-500 font-semibold">Clique para tirar foto</p>
+                            <p class="text-xs text-gray-400 mt-1">Olhe diretamente para a câmera</p>
+                        </div>
+                        <img id="preview-frente" class="hidden" />
+                    </div>
+                </div>
+
+                <!-- Foto Esquerda -->
+                <div class="text-center">
+                    <h3 class="font-bold mb-3 text-lg">3️⃣ Lado Esquerdo</h3>
+                    <div class="photo-slot" id="slot-esquerda" onclick="document.getElementById('input-esquerda').click()">
+                        <input type="file" id="input-esquerda" accept="image/*" class="hidden" onchange="handlePhotoUpload(event, 'esquerda')" />
+                        <div class="flex flex-col items-center justify-center h-full p-4" id="placeholder-esquerda">
+                            <svg class="w-16 h-16 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <p class="text-sm text-gray-500 font-semibold">Clique para tirar foto</p>
+                            <p class="text-xs text-gray-400 mt-1">Vire o rosto 45° à esquerda</p>
+                        </div>
+                        <img id="preview-esquerda" class="hidden" />
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-proximo-questionario" class="w-full bg-gray-300 text-gray-500 font-bold py-4 px-6 rounded-lg text-lg cursor-not-allowed" disabled>
+                Continuar para o Questionário
+            </button>
+        </div>
+
+        <!-- PASSO 2: Questionário -->
+        <div id="section-questionario" class="bg-white rounded-2xl shadow-xl p-8 mb-8 hidden">
+            <div class="flex items-center mb-6">
+                <span class="bg-brand-orange text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mr-4">📝</span>
+                <div>
+                    <h2 class="text-3xl font-bold">Conte mais sobre sua barba</h2>
+                    <p class="text-gray-600 mt-1">Essas informações nos ajudam a personalizar sua análise</p>
+                </div>
+            </div>
+
+            <form id="formulario-questionario">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">Qual seu principal objetivo? *</label>
+                        <select name="objetivo" required class="w-full border-2 border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            <option value="">Selecione...</option>
+                            <option value="crescimento">🌱 Crescer a barba / Preencher falhas</option>
+                            <option value="hidratacao">💧 Hidratar e nutrir</option>
+                            <option value="modelagem">✂️ Modelar e dar forma</option>
+                            <option value="controle">🎯 Controlar frizz</option>
+                            <option value="completo">⭐ Cuidado completo</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">Como é sua pele? *</label>
+                        <select name="pele" required class="w-full border-2 border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            <option value="">Selecione...</option>
+                            <option value="oleosa">Oleosa</option>
+                            <option value="seca">Seca</option>
+                            <option value="mista">Mista</option>
+                            <option value="sensivel">Sensível</option>
+                            <option value="normal">Normal</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">Há quanto tempo tem barba? *</label>
+                        <select name="tempo" required class="w-full border-2 border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            <option value="">Selecione...</option>
+                            <option value="inicio">Estou começando (menos de 3 meses)</option>
+                            <option value="medio">3 a 12 meses</option>
+                            <option value="longo">Mais de 1 ano</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">Qual estilo de barba prefere? *</label>
+                        <select name="estilo" required class="w-full border-2 border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                            <option value="">Selecione...</option>
+                            <option value="lenhador">🪓 Lenhador (barba longa e cheia)</option>
+                            <option value="alinhada">✨ Alinhada (barba curta e definida)</option>
+                            <option value="designer">🎨 Designer (barba média com contornos)</option>
+                            <option value="natural">🌿 Natural (deixo crescer)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex gap-4">
+                    <button type="button" onclick="voltarParaFotos()" class="flex-1 bg-gray-200 text-gray-700 font-bold py-4 px-6 rounded-lg hover:bg-gray-300 transition-colors">
+                        ← Voltar
+                    </button>
+                    <button type="submit" class="flex-1 bg-brand-orange text-white font-bold py-4 px-6 rounded-lg hover:bg-orange-600 transition-colors text-lg">
+                        Analisar minha barba 🚀
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PASSO 3: Análise em andamento -->
+        <div id="section-analise" class="bg-white rounded-2xl shadow-xl p-12 mb-8 hidden">
+            <div class="text-center">
+                <div class="loading-spinner mx-auto mb-6"></div>
+                <h2 class="text-2xl font-bold mb-3">Analisando suas fotos com IA...</h2>
+                <p class="text-gray-600 mb-4">Nossa inteligência artificial está examinando os 3 ângulos da sua barba</p>
+                <div class="max-w-md mx-auto bg-gray-100 rounded-lg p-4">
+                    <div class="space-y-2 text-left text-sm">
+                        <p class="flex items-center text-gray-700">
+                            <span class="brand-orange mr-2">✓</span> Detectando densidade e uniformidade
+                        </p>
+                        <p class="flex items-center text-gray-700">
+                            <span class="brand-orange mr-2">✓</span> Identificando áreas com falhas
+                        </p>
+                        <p class="flex items-center text-gray-700">
+                            <span class="brand-orange mr-2">✓</span> Analisando textura e hidratação
+                        </p>
+                        <p class="flex items-center text-gray-700">
+                            <span class="brand-orange mr-2">✓</span> Comparando lado direito e esquerdo
+                        </p>
+                        <p class="flex items-center text-gray-700">
+                            <span class="brand-orange mr-2">⏳</span> Selecionando produtos ideais...
+                        </p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-4">Isso pode levar até 30 segundos</p>
+            </div>
+        </div>
+
+        <!-- PASSO 4: Resultados -->
+        <div id="section-resultados" class="hidden">
+            <!-- Análise Detalhada -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-6">
+                <div class="flex items-center mb-6">
+                    <span class="bg-brand-orange text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mr-4">📊</span>
+                    <h2 class="text-3xl font-bold">Análise da sua barba</h2>
+                </div>
+                <div id="resultado-analise" class="prose max-w-none text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-6"></div>
+            </div>
+
+            <!-- Produtos Recomendados -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-6">
+                <div class="flex items-center mb-6">
+                    <span class="bg-brand-orange text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mr-4">🎯</span>
+                    <h2 class="text-3xl font-bold">Produtos recomendados para você</h2>
+                </div>
+                <div id="resultado-produtos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Rotina -->
+            <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-xl p-8 mb-6">
+                <div class="flex items-center mb-6">
+                    <span class="bg-brand-orange text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold mr-4">📅</span>
+                    <h2 class="text-3xl font-bold">Sua rotina personalizada</h2>
+                </div>
+                <div id="resultado-rotina" class="bg-white rounded-lg p-6 text-gray-700 whitespace-pre-line leading-relaxed"></div>
+            </div>
+
+            <!-- Tempo de Resultados -->
+            <div class="bg-white rounded-2xl shadow-xl p-8 mb-6">
+                <div class="flex items-center mb-4">
+                    <span class="text-2xl mr-3">⏱️</span>
+                    <h3 class="text-xl font-bold">Quando você verá resultados?</h3>
+                </div>
+                <p id="resultado-tempo" class="text-gray-700 text-lg"></p>
+            </div>
+
+            <!-- Dicas -->
+            <div class="bg-blue-50 rounded-2xl shadow-xl p-8 mb-6">
+                <div class="flex items-center mb-4">
+                    <span class="text-2xl mr-3">💡</span>
+                    <h3 class="text-xl font-bold">Dicas importantes</h3>
+                </div>
+                <ul id="resultado-dicas" class="space-y-3"></ul>
+            </div>
+
+            <!-- CTA -->
+            <div class="bg-gradient-bg text-white rounded-2xl shadow-2xl p-12 text-center">
+                <h2 class="text-3xl font-bold mb-4">Pronto para transformar sua barba?</h2>
+                <p class="text-xl mb-6 text-gray-300">Use o código exclusivo <span id="cupom-code" class="brand-orange font-black text-2xl bg-white px-4 py-2 rounded-lg"></span> e ganhe <span class="font-bold text-green-400">15% de desconto</span>!</p>
+                <p class="text-sm text-gray-400 mb-6">*Cupom válido por 7 dias • Aplicável em todos os produtos recomendados</p>
+                <a href="https://barbaderespeito.com.br" target="_blank" onclick="trackEvent('click_cta_site', {event_category: 'conversao', event_label: 'Ir para site'})" class="inline-block bg-brand-orange text-white font-bold py-5 px-12 rounded-xl hover:bg-orange-600 transition-all text-xl shadow-lg hover-lift">
+                    Ver produtos no site 🛒
+                </a>
+                <p class="mt-6 text-sm text-gray-400">
+                    <button onclick="novaAnalise()" class="underline hover:text-white">
+                        Fazer novo diagnóstico
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-lg font-bold brand-orange mb-2">BARBA DE RESPEITO</p>
+            <p class="text-sm text-gray-300">Diagnóstico inteligente com IA • © 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        const fotosCarregadas = {
+            direita: null,
+            frente: null,
+            esquerda: null
+        };
+
+        // Gerar cupom único para o usuário
+        function gerarCupomUnico() {
+            const timestamp = Date.now().toString(36);
+            const random = Math.random().toString(36).substr(2, 5).toUpperCase();
+            return `DIAG${random}`;
+        }
+
+        const cupomPersonalizado = gerarCupomUnico();
+
+        // Tracking de eventos
+        function trackEvent(eventName, eventData = {}) {
+            // Google Analytics (se configurado)
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, eventData);
+            }
+            
+            // Facebook Pixel (se configurado)
+            if (typeof fbq !== 'undefined') {
+                fbq('track', eventName, eventData);
+            }
+            
+            console.log('Event tracked:', eventName, eventData);
+        }
+
+        function handlePhotoUpload(event, posicao) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                fotosCarregadas[posicao] = file;
+                
+                // Atualizar preview
+                const preview = document.getElementById(`preview-${posicao}`);
+                const placeholder = document.getElementById(`placeholder-${posicao}`);
+                const slot = document.getElementById(`slot-${posicao}`);
+                
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+                slot.classList.add('filled');
+                
+                // Track foto enviada
+                trackEvent('foto_enviada', {
+                    posicao: posicao,
+                    event_category: 'diagnostico',
+                    event_label: `Foto ${posicao}`
+                });
+                
+                verificarTodasFotos();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function verificarTodasFotos() {
+            const todasCarregadas = fotosCarregadas.direita && fotosCarregadas.frente && fotosCarregadas.esquerda;
+            const btn = document.getElementById('btn-proximo-questionario');
+            
+            if (todasCarregadas) {
+                btn.disabled = false;
+                btn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                btn.classList.add('bg-brand-orange', 'text-white', 'hover:bg-orange-600', 'cursor-pointer');
+                btn.onclick = irParaQuestionario;
+            }
+        }
+
+        function irParaQuestionario() {
+            document.getElementById('section-fotos').classList.add('hidden');
+            document.getElementById('section-questionario').classList.remove('hidden');
+            
+            // Atualizar indicadores
+            document.getElementById('step-indicator-1').classList.add('completed');
+            document.getElementById('step-indicator-1').classList.remove('active');
+            document.getElementById('step-indicator-2').classList.add('active');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function voltarParaFotos() {
+            document.getElementById('section-questionario').classList.add('hidden');
+            document.getElementById('section-fotos').classList.remove('hidden');
+            
+            document.getElementById('step-indicator-2').classList.remove('active');
+            document.getElementById('step-indicator-1').classList.add('active');
+            document.getElementById('step-indicator-1').classList.remove('completed');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('formulario-questionario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            // Track questionário completo
+            trackEvent('questionario_completo', {
+                objetivo: formData.get('objetivo'),
+                event_category: 'diagnostico',
+                event_label: 'Questionário Preenchido'
+            });
+            
+            // Adicionar fotos ao FormData
+            formData.append('fotos', fotosCarregadas.direita);
+            formData.append('fotos', fotosCarregadas.frente);
+            formData.append('fotos', fotosCarregadas.esquerda);
+            
+            // Esconder questionário e mostrar análise
+            document.getElementById('section-questionario').classList.add('hidden');
+            document.getElementById('section-analise').classList.remove('hidden');
+            
+            // Atualizar indicadores
+            document.getElementById('step-indicator-2').classList.add('completed');
+            document.getElementById('step-indicator-2').classList.remove('active');
+            document.getElementById('step-indicator-3').classList.add('active');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            try {
+                const response = await fetch('/api/analisar', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert('Erro: ' + data.error);
+                    location.reload();
+                    return;
+                }
+                
+                // Track análise completa
+                trackEvent('analise_completa', {
+                    event_category: 'diagnostico',
+                    event_label: 'Análise IA Concluída'
+                });
+                
+                mostrarResultados(data.resultado);
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar análise. Por favor, tente novamente.');
+                location.reload();
+            }
+        });
+
+        function mostrarResultados(resultado) {
+            // Esconder análise e mostrar resultados
+            document.getElementById('section-analise').classList.add('hidden');
+            document.getElementById('section-resultados').classList.remove('hidden');
+            
+            // Atualizar indicadores
+            document.getElementById('step-indicator-3').classList.add('completed');
+            document.getElementById('step-indicator-3').classList.remove('active');
+            document.getElementById('step-indicator-4').classList.add('active');
+            
+            // Preencher análise
+            document.getElementById('resultado-analise').textContent = resultado.analise;
+            
+            // Preencher produtos
+            const produtosHtml = resultado.produtos.map((produto, index) => {
+                const badgeClass = `badge-priority-${produto.prioridade || 'media'}`;
+                
+                // Track visualização de produto
+                setTimeout(() => {
+                    trackEvent('produto_recomendado', {
+                        produto_nome: produto.nome,
+                        prioridade: produto.prioridade,
+                        event_category: 'produtos',
+                        event_label: produto.nome
+                    });
+                }, index * 100);
+                
+                return `
+                    <div class="product-card bg-white border-2 border-gray-200 rounded-xl p-6 shadow-md">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-bold text-lg brand-orange">${produto.nome}</h4>
+                            ${produto.prioridade ? `<span class="${badgeClass} px-2 py-1 rounded-full text-xs font-bold uppercase">${produto.prioridade}</span>` : ''}
+                        </div>
+                        <p class="text-gray-700 text-sm mb-4 leading-relaxed">${produto.motivo}</p>
+                        <a href="${produto.link}" target="_blank" onclick="trackEvent('click_produto', {produto_nome: '${produto.nome}', event_category: 'conversao', event_label: '${produto.nome}'})" class="block w-full bg-gray-900 text-white text-center px-4 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors">
+                            Ver produto →
+                        </a>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('resultado-produtos').innerHTML = produtosHtml;
+            
+            // Preencher rotina
+            document.getElementById('resultado-rotina').textContent = resultado.rotina;
+            
+            // Preencher tempo de resultados
+            document.getElementById('resultado-tempo').textContent = resultado.tempoResultados;
+            
+            // Preencher dicas
+            const dicasHtml = resultado.dicas.map(dica => `
+                <li class="flex items-start">
+                    <span class="brand-orange font-bold mr-3 text-xl">•</span>
+                    <span class="text-gray-700">${dica}</span>
+                </li>
+            `).join('');
+            document.getElementById('resultado-dicas').innerHTML = dicasHtml;
+            
+            // Mostrar cupom personalizado
+            document.getElementById('cupom-code').textContent = cupomPersonalizado;
+            
+            // Track resultados exibidos
+            trackEvent('resultados_exibidos', {
+                total_produtos: resultado.produtos.length,
+                event_category: 'diagnostico',
+                event_label: 'Resultados Completos',
+                value: resultado.produtos.length
+            });
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function novaAnalise() {
+            trackEvent('nova_analise', {
+                event_category: 'diagnostico',
+                event_label: 'Reiniciar Diagnóstico'
+            });
+            location.reload();
+        }
+    </script>
+</body>
+</html>
